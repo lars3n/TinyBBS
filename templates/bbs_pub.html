@@ -1,0 +1,82 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+<script type="text/javascript" src="{%static "tinymce/js/tinymce/tinymce.min.js" %}"></script>
+<script type="text/javascript">
+	tinymce.init({
+		selector: "#mytextarea",
+	});
+</script>
+
+
+<div class="panel panel-default">
+	<div class="panel-heading">
+		<h3 class="panel-title">创建新主题</h3>
+	</div>
+	<div class="panel-body">
+		<form accept-charset="UTF-8" action="{% url "bbs_pub" %}" id="new_topic" method="post" novalidate="novalidate" name="add_new">
+		{% csrf_token %}
+		<input name="uid" type="hidden" value="1" />
+		<input name="node_id" type="hidden" value="1" />
+			<div class="form-group">
+				<label for="title">标题</label>
+				<input class="form-control" id="topic_title" name="bbs_title" type="text" value="" />
+				<span class="help-block red"></span>
+			</div>
+			<div class="form-group">
+			<label for="node_id">类别</label>
+			<select name="bbs_category"" id="node_id" class="form-control">
+			<option selected="selected" value="">请选择分类</option>
+			{% for category in categories %}
+				<option value="{{category.id}}">
+				{{category}}
+				</option>
+			{% endfor %}					
+			</select>
+			<span class="help-block red"></span>
+			</div>
+			<div class="form-group">
+				<textarea class="form-control" id="mytextarea" name="bbs_content" placeholder="话题内容" rows="10"></textarea>
+				<span class="help-block red"></span>
+				<p>
+				<span text-muted>可直接粘贴链接和图片地址/发代码用&lt;pre&gt;标签</span>
+				<span class="pull-right">
+				<!--<input id="upload_file" type="button" value="图片/附件"  class="btn btn-default">-->
+				</span>
+				</p>
+			</div>
+			<div class="form-group">
+			
+				<div class="col-md-4">
+				<input class="form-control" id="captcha_code" name="captcha_1" size="50" type="text"  value=""/>
+				<span class="help-block red"></span>
+				</div>
+				<div class="col-md-3">
+					<a href="javascript:reloadcode();" title="更换验证码">
+					<img src="{{ image_url }}" class="captcha" name="captcha_img" id="checkCodeImg" border="0" />
+					</a>&nbsp;&nbsp;
+
+					<input id="id_reg_captcha_0" name="captcha_0" type="hidden" value="{{ hashkey }}" />  
+				</div>
+			</div>
+			
+			<button type="submit" class="btn btn-primary">创建</button><small class="text-muted">(支持 Ctrl + Enter 快捷键)</small>
+		</form>
+	</div>
+</div>
+			
+<script src="http://libs.baidu.com/jquery/2.0.0/jquery.min.js"></script>
+<script src="http://libs.baidu.com/bootstrap/3.0.3/js/bootstrap.min.js"></script>
+<script type="text/javascript">
+	$('.captcha').click(function(){
+		var tmp = Math.random().toString();
+		$.get("/new_captcha/", function(result){
+			$('.captcha').attr("src", result);
+			$('#id_captcha_0').attr("value", result.split('/')[3]);
+		});
+	return false;
+});
+</script>
+
+{% endblock content %}

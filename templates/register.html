@@ -1,0 +1,76 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+<link href="{%static "css/style.css"%}" rel="stylesheet">
+
+<div class="panel panel-default">
+	<div class="panel-heading">
+	<a href="{% url "home" %}">Home</a> <span class="chevron">&nbsp;›&nbsp;</span> 注册 &nbsp;
+	</div>
+	<div class="panel-body">
+		<form accept-charset="UTF-8" action="" class="form-horizontal" id="new_user" method="post" novalidate="novalidate">
+		{% csrf_token %}
+			<div class="form-group">
+				<label class="col-md-2 control-label" for="user_nickname">用户名</label>
+				<div class="col-md-6">
+				<input class="form-control" id="user_nickname" name="username" size="50" type="text" value=""/>
+				<span class="help-block red">{{ form.username.errors }}</span>
+				</div>
+			</div>
+			<div class="form-group">
+				<label class="col-md-2 control-label" for="user_password">电子邮箱</label>
+				<div class="col-md-6">
+				<input class="form-control" id="user_password" name="email" size="50" type="text" value=""/>
+				<span class="help-block red">{{ form.email.errors }}</span>
+				</div>
+			</div>
+			<div class="form-group">
+				<label class="col-md-2 control-label" for="user_password">密码</label>
+				<div class="col-md-6">
+				<input class="form-control" id="user_password" name="password1" size="50" type="password" value=""/>
+				<span class="help-block red">{{ form.password1.errors }}</span>
+				</div>
+			</div>
+			<div class="form-group">
+				<label class="col-md-2 control-label" for="user_password">密码确认</label>
+				<div class="col-md-6">
+				<input class="form-control" id="user_password" name="password2" size="50" type="password" value=""/>
+				<span class="help-block red">{{ form.password2.errors }}</span>
+				</div>
+			</div>
+			<div class="form-group">
+				<label class="col-md-2 control-label" for="captcha_code">验证码</label>
+				<div class="col-md-4">
+				<input class="form-control" id="captcha_code" name="captcha_1" size="50" type="text"  value=""/>
+				<span class="help-block red">{{ form.captcha.errors }}</span>
+				</div>
+				<div class="col-md-3">
+					<a href="javascript:reloadcode();" title="更换验证码">
+					<img src="{{ image_url }}" class="captcha" name="captcha_img" id="checkCodeImg" border="0" />
+					</a>&nbsp;&nbsp;
+					<input id="id_reg_captcha_0" name="captcha_0" type="hidden" value="{{ hashkey }}" />  
+				</div>
+			</div>
+
+			<div class='form-group'>
+				<div class="col-md-offset-2 col-md-9">
+					<button type="submit" name="commit" class="btn btn-primary">注册</button>
+				</div>
+			</div>
+		</form>
+	</div>
+</div>
+
+<script src="http://apps.bdimg.com/libs/jquery/1.11.1/jquery.min.js"></script>
+<script type="text/javascript">
+	$('.captcha').click(function(){
+		var tmp = Math.random().toString();
+		$.get("/new_captcha/", function(result){
+			$('.captcha').attr("src", result);
+			$('#id_captcha_0').attr("value", result.split('/')[3]);
+		});
+	return false;
+});
+</script>
+{% endblock content %}

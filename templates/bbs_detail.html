@@ -1,0 +1,192 @@
+{% extends 'base.html' %}
+{% load static %}
+{% load humanize %}
+
+{% block content %}
+<link href="{%static "css/style.css"%}" rel="stylesheet">
+  
+<div class="panel panel-default">
+	<div class="panel-heading topic-detail-heading">
+		<div class="pull-right"><a href="{% url "user_profile" bbs.bbs_author.user.id %}">
+		<img src="/media/{{ bbs.bbs_author.avatar }}" height="80px" width="80px" alt="头像">
+		</a></div>
+		<p><a href="{% url "home" %}">HOME</a> / <a href="#">{{ bbs.bbs_category }}</a></p>
+		<h2 class="panel-title">{{ bbs.bbs_title }}</h2>
+		<small class="text-muted">
+			<span>By <a href="#">{{bbs.bbs_author}}</a></span>&nbsp;•&nbsp;
+			<span>{{bbs.created_at|naturaltime}}</span>&nbsp;•&nbsp;
+			<span>{{bbs.view_count}}次点击</span>			
+			<span>• <a href="#id_content" class="reply">回复</a></span>
+			{% if favorited %}
+			<span><a href="{% url "favor_del" bbs.id %}" title="点击取消收藏">取消收藏</a></span>
+			{% else %}
+			<span><a href="{% url "favor_add" bbs.id %}" title="点击收藏">收藏</a></span>
+			{% endif %}
+		</small>
+	</div>
+	<div class="panel-body content">
+		{{bbs.bbs_content|safe|removetags:"html body script"}}				
+
+		<hr><p class="tag">
+			
+		</p>
+
+	</div>
+	<div class="panel-footer">
+	{% if user.username == bbs.bbs_author.user.username %}
+	<a href="javascript:if(confirm('确实要删除吗?'))location='{% url "bbs_delete" bbs.id %}'" class="btn btn-sm btn-danger" data-method="edit" rel="nofollow">删除</a>
+	{% endif %}	
+	</div>
+</div><!-- /.panel content -->
+
+<div class="panel panel-default">
+	<div class="panel-heading">
+		<h5><span id="comments">{{ bbs_comments.count }}</span><span> 回复 | 直到 {{now}}</span><a href="#id_content" class="pull-right"><span class="text-muted">添加回复</span></a></h5>
+	</div>
+	<div class="panel-body">
+		   <ul id="comment_list">
+		   {% if curPage %}
+				{%for cmt in curPage%}
+			<div class="row" id="r1">
+				<div class="col-md-1"><a href="#">
+					<img class="img-rounded" src="/media/{{cmt.user_id.avatar}}" alt="头像" height="40px" width="40px" border="0">
+				</a></div>
+					<div class="col-md-11 reply-body"><h5>
+					<span>
+					<a href="{% url "user_profile" cmt.user_id.user.id %}">{{cmt.user_id}} </a>({{cmt.user_id.signature}})&nbsp;&nbsp;{{cmt.pub_date|naturaltime}}</span>
+					<span class='pull-right' id="r1"># {{forloop.counter}}
+					<a href="#id_content" id="{{cmt.user_id}}" class="replay"  type="{% url "user_profile" cmt.user_id.user.id %}">回复</a></span></h5>
+					<p>
+					{{cmt.cmt_content| safe|removetags:"html body script"}}                                  
+					</p>
+					</div>
+
+			</div>
+			<hr class="smallhr">			
+				{% endfor %}
+				<div id = "comm">
+					<ul class = 'con'>   
+					</ul>
+				</div><!--  ajax 提交的回复内容在此-->
+				
+				<nav>
+					<ul class="pager">
+					{%if curPage.has_previous%}
+						<li><a href="{% url "bbs_detail" bbs.id curPage.previous_page_number %}"><span>Previous</span></a></li>
+					{%endif%}
+					<a align="right">{{curPage.number}} / {{pcount}} </a>
+					{%if curPage.has_next%}
+						<li><a href="{% url "bbs_detail" bbs.id curPage.next_page_number %}">Next</a></li>
+					{%endif%}
+
+					</ul>
+				</nav>
+  
+			{% else %}
+			
+			{%endif%}
+			</ul>        
+                    
+	</div>
+</div><!-- /.panel comment -->
+<div id="error"></div>
+
+
+
+
+{% if user.is_authenticated %}				
+<div class="panel panel-default" id="Reply">
+	<div class="panel-heading">
+		<h4 class="panel-title">回复<a href="#" class="pull-right"><span class="text-muted"><strong>↑</strong>回到顶部</span></a></h4>
+	</div>
+	<div class="panel-body">
+	
+		<form method="post" id="user_content" enctype="multipart/form-data">
+		{% csrf_token %}
+				<div class="form-group">
+					<textarea class="form-control" id="id_content" name="content" rows="5"></textarea>
+					<span class="help-block red"></span>
+					<p>
+					<span class="text-muted">可直接粘贴链接和图片地址/发代码用&lt;pre&gt;标签</span>
+					<span class="pull-right">
+					<input id="upload_file" type="button" value="图片/附件"  class="btn btn-default">
+					</span>
+					</p>
+				</div>
+				<button type="submit" class="btn btn-primary" id="comment-submit">回复</button>
+		</form>		
+	</div>
+</div><!-- /.panel add comment -->
+{% else %}			
+				
+                <div class="panel panel-default" id="Reply">
+                    <div class="panel-heading">
+                        <h4 class="panel-title">回复</h4>
+                    </div>
+                    <div class="panel-body">
+                        <div class="well text-center">
+                                <a class="btn btn-default" href="{% url "login" %}">登录</a>发表 or 还没有账号？去
+								<a href="{% url "register" %}">注册</a>
+                        </div>
+                    </div>
+                </div><!-- /.panel add comment -->
+{% endif %}
+
+<script src="http://apps.bdimg.com/libs/jquery/1.11.1/jquery.min.js"></script>	
+<script>
+    $(function() {
+             $("#user_content").submit(function(){                  
+             var content = $("#id_content").val();             
+        $.ajax({
+                 type:"post",
+                 dataType:"json", 
+                 url:"{% url "replays" bbs.id %}",         
+                 data: {                
+                 'content': content,
+                 },        
+        success: function(data){           
+                $('#user_content')[0].reset();                   
+        
+				var newcomment =  "<div id=\"r_2448841\" class=\"cell\">" +      
+								"<table cellpadding=\"0\" cellspacing=\"0\" border=\"0\" width=\"100%\">" +
+									"<tr>" +
+										"<td width=\"48\" valign=\"top\" align=\"center\"><img src=\"\/media\/" +
+										data.avatar +
+										"\" height=\"40px\" width=\"40px\" border=\"0\" align=\"default\" /></td>" +
+										"<td width=\"10\" valign=\"top\"></td>" +
+										"<td width=\"auto\" valign=\"top\" align=\"left\">" +
+											"<strong><a href=\"\" class=\"dark\">" + "你" + "</a></strong>&nbsp; &nbsp;" +
+											"<span>" + "(" + data.signature + ")" + "&nbsp; &nbsp;" + "刚刚" + "</span>" +
+											"<div class=\"sep5\"></div>" +
+											"<div class=\"reply_content\">" + data.content + "</div>" +
+										"</td>" +
+									"</tr>" +
+								"</table>"+
+								"</div>" +
+								"<hr class=\"smallhr\">"
+                $(".con").append(newcomment);
+                 },
+		error: function(data){
+
+		$("#user_content").append("字数不得小于10个字符");
+		$('#user_content').reset();}
+        });   
+                return false;     
+         });  
+     });
+
+</script>
+
+<script>
+$(function(){
+	$(".replay").click(function(){
+	var username = $(this).attr("id");
+	var userurl = $(this).attr("type");
+	$("#id_content").val("<a href=\"" + userurl + "\">"  + "@" + username + " " + "</a>");
+	});
+});
+</script>
+
+
+
+{% endblock content %}

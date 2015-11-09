@@ -1,0 +1,40 @@
+{% extends 'base.html' %}
+{% load static %}
+{% load humanize %}
+
+{% block content %}
+<link href="{%static "css/style.css"%}" rel="stylesheet">
+
+	<div class="panel panel-default">
+		<div class="panel-heading">
+		{% if bbses %}
+			<h3 class="panel-title">搜索: <span class="red">#{{keyword}}</span> ({{bbses.all.count}})</h3>
+		{% else %}
+			<h3 class="panel-title">搜索: <span class="red">#{{keyword}}</span> (0)</h3>
+		{% endif %}
+		</div>
+		<div class="panel-body">
+									<ul class="media-list">
+				{% if bbses %}
+				{% for bbs in bbses %}
+				<li class="media">
+					<div class="pull-right">
+						<span class="badge badge-info topic-comment">{{bbs.comments_set.all.count}}</span>
+					</div>
+				   
+					<div class="media-body">
+						<h4 class="media-heading"><a href="{% url "bbs_detail" bbs.id %}"><span class=red></span>{{bbs.bbs_title}}</a>&nbsp;<span class="text-muted">{{bbs.created_at| date:"F j, Y"}}</span></h4>
+					</div>
+
+				</li>
+				{% endfor %}
+				{% else %}
+				暂无话题
+				{% endif %}
+									
+									</ul>
+														</div>
+	</div>
+
+
+{% endblock content %}

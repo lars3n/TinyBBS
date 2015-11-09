@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html>
+<head>
+{% load static %}
+	<meta charset='UTF-8'>
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>Small BBS ~！</title>
+	<meta name="keywords" content="bbs small" />
+	<meta name="description" content="轻社区" />
+	<meta http-equiv="X-UA-Compatible" content="IE=edge">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+
+	<link href="{%static "css/bootstrap.min.css" %}" media="screen" rel="stylesheet" type="text/css" />
+	<link href="{%static "css/style.css" %}" media="screen" rel="stylesheet" type="text/css" />
+
+</head>
+<body>
+
+<div id="navbar-wrapper">
+	<div  id="navigation" class="navbar navbar-inverse navbar-fixed-top">
+		<div class="container">
+			<div class="navbar-header">
+						<button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
+							<span class="icon-bar"></span>
+							<span class="icon-bar"></span>
+							<span class="icon-bar"></span>
+						</button>
+				<a class="navbar-brand" href="{% url "home" %}"><b>Small BBS</b></a>
+			</div>
+
+				<div class="navbar-collapse collapse">
+					<ul class="nav navbar-nav h4">
+						<li class="active"><a href="{% url "home" %}">首页</a></li>
+
+						<li><a href="{% url "bbs_pub" %}">发表</a></li>
+					</ul>
+
+					<form action="{% url "search" %}" method="post" accept-charset="utf-8" class="navbar-form navbar-left" target="_blank" role="search">
+					{% csrf_token %}
+						<div style="display:none">
+						</div>		      
+						<div class="form-group">
+								<input type="text" class="form-control" name="keyword" placeholder="输入关键字回车">
+						</div>
+					</form>
+					<ul class="nav navbar-nav navbar-right">
+					{% if user.is_authenticated %}
+						<li><a href="{% url "user_profile" user.id %}">{{user.username}}</a></li>
+						<li><a href="{% url "message" %}"><span class="glyphicon glyphicon-envelope">
+						{% if newMsg %}
+							{{newMsg}}
+						{% endif %}</span></a></li>			
+						<li><a href="{% url 'logout' %}">退出</a></li>
+					<!--<li><a href="{% url 'bbs_pub' %}">发表新主题</a></li>-->
+						<li><a href="{% url "change_info" %}">设置</a></li>
+					{% else %}
+						<li><a href="{% url "login" %}">登录</a></li>
+						<li><a href="{% url "register" %}">注册</a></li>
+					{% endif %}
+					</ul>
+				</div><!--/.nav-collapse -->
+				
+				</div>
+		</div>
+
+	</div>    
+<div class="container">
+    <div class="row">
+        <div class="col-md-8">
+
+							{% block content %}
+							{% endblock content%}
+                
+        </div><!-- /.col-md-8 -->
+
+<div class="col-md-4">
+
+{% if user.is_authenticated %}
+	<div class="panel">
+		<div class="panel-body">
+			<div class="row">
+				<div class="col-md-5">
+					<a href="#"><img alt="hellatest large avatar" class="img-rounded" src="/media/{{user.bbs_user.avatar}}"  height="80px" width="80px"/></a>
+				</div>
+				<div class="col-md-7">
+					<ul class="list-unstyled">
+						<li><a href="{% url "user_profile" user.id %}" title="hellatest">{{user.username}}</a></li>
+						<li>用户组：普通会员</li>
+						<li>积分：300</li>
+						<li>签名： {{user.bbs_user.signature}}</li>
+					</ul>
+				</div>
+			</div>
+			<div class="row text-center">
+				<div class="col-md-6">
+					<p><a href="#">{{ user.bbs_user.favorites.count }}</a></p>
+					<p><a href="{% url "favorites" %}">收藏</a></p>
+				</div>
+				<div class="col-md-6">
+					<p><a href="#">{{user.bbs_user.fans.all.count}}</a></p>
+					<p><a href="{% url "follow" %}">关注</a></p>
+				</div>
+				<div class="col-md-6">
+					<p><a href="#">{{user.bbs_user.follow.all.count}}</a></p>
+					<p><a href="{% url "fans" %}">粉丝</a></p>
+				</div>
+			</div>
+		</div>
+		<div class="panel-footer text-muted">
+					暂无提醒
+				</div>
+	</div>
+{% else %}
+
+<div class="panel panel-default">
+    <div class="panel-heading">
+        <h4>Small BBS</h4>
+    </div>
+    <div class="panel-body">
+        <a href="{% url "register" %}" class="btn btn-default">现在注册</a> 已注册请
+		<a href="{% url "login" %}" class="startbbs">登入</a>
+	</div>
+</div>
+{% endif %}
+
+
+			{% if program_cate %}
+				<div class="panel panel-default">
+					<div class="panel-heading">
+						<h3 class="panel-title">节点列表</h3>
+					</div>
+					<div class="panel-body">
+										<p><span class="text-muted">编程</span></p>
+						<p>
+						{% for cate in program_cate %}
+								<a href="{% url "category" cate.id %}">{{cate}}</a>&nbsp;
+						{% endfor %}
+						</p>
+								<p><span class="text-muted">其他版区</span></p>
+
+					</div>
+				</div>
+			{% endif %}
+			
+				{% if allBbsCount and userRegisterCount and allCommentCount %}
+				 <div class="panel panel-default">
+				    <div class="panel-heading">
+				        <h3 class="panel-title">社区统计</h3>
+				    </div>
+				    <div class="panel-body">
+				        <ul class="list-unstyled">
+				            <li>今日话题： {{ bbsTodayCount }}</li>
+				            <li>注册会员： {{ userRegisterCount }}</li>
+				            <li>话题总数： {{ allBbsCount }}</li>
+				            <li>回复总数： {{ allCommentCount }}</li>
+				        </ul>
+				    </div>
+				</div> 
+				{% endif %}
+				
+			<div class="panel panel-default">
+				<!--<div class="panel-heading">
+					<h3 class="panel-title">广告位</h3>
+				</div>-->
+				<div class="panel-body">
+			<script async src="//pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
+			<!-- 300250-hui -->
+			<ins class="adsbygoogle"
+				 style="display:inline-block;width:260px;height:250px"
+				 data-ad-client="ca-pub-0724371017144625"
+				 data-ad-slot="9611829137">
+				 </ins>
+			<script>
+			(adsbygoogle = window.adsbygoogle || []).push({});
+			</script>
+				</div>
+			</div>	
+			
+			
+			<div class="panel panel-default">
+				<div class="panel-heading">
+					<h3 class="panel-title">友情链接</h3>
+				</div>
+				<div class="panel-body">
+					<ul class="list-unstyled">
+						<li style="width:0; height:0; overflow:hidden;"><a href="#" target="_blank">KnowS3c BBS</a></li>
+
+						<li><a href="#" target="_blank">百度</a></li>
+					</ul>
+				</div>
+			</div>
+		</div><!-- /.col-md-4 -->
+
+	</div><!-- /.row -->
+</div><!-- /.container -->
+
+<footer class="small">
+	<div class="container">
+		<div class="row">
+			<ul class="list-inline">
+				<li><a href="#">关于</a></li>
+					<li><a href="#">付费服务</a></li>
+					<li><a href="#">联系方式</a></li>
+					<li><a href="#" target=_blank>商业授权</a></li>
+					<li><a href="#">赞助开发</a></li>
+			</ul>
+			<p>Powered by <a href="#" class="text-muted" target="_blank">BBS</a>
+</p>
+		</div>
+	</div>
+</footer>
+
+
+    <!-- Bootstrap core JavaScript
+    ================================================== -->
+    <!-- Placed at the end of the document so the pages load faster -->
+    <script src="//cdn.bootcss.com/jquery/1.11.3/jquery.min.js"></script>
+<script src="http://libs.baidu.com/jquery/2.0.0/jquery.min.js"></script>
+<script src="http://libs.baidu.com/bootstrap/3.0.3/js/bootstrap.min.js"></script>
+
+</body>
+</html>
+
+
+

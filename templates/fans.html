@@ -1,0 +1,25 @@
+{% extends 'base.html' %}
+{% load static %}
+{% load humanize %}
+
+{% block content %}
+<link href="{%static "css/style.css"%}" rel="stylesheet">
+<div class="panel panel-default">
+	<div class="panel-heading">
+		<h3 class="panel-title">关注我的会员</h3>
+	</div>
+	<div class="panel-body">
+		<ul class='user-list clearfix'>
+
+		{% for i in fansList %}
+			<li>
+			<a href="{% url "user_profile" i.user.id %}"  title="{{i}}">
+			<img class="img-rounded" alt="xcloud" src="/media/{{i.avatar}}" />
+			</a>
+			</li>
+		{% endfor %}
+		</ul>
+	</div>
+</div>
+
+{% endblock content %}

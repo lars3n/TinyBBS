@@ -1,0 +1,125 @@
+{% extends 'base.html' %}
+{% load static %}
+{% load humanize %}
+{% block content %}
+<link href="{%static "css/style.css"%}" rel="stylesheet">
+
+<div class="panel panel-default">
+                    <div class="panel-body">
+                        <div class="col-md-2">
+                            <img  src="/media/{{user_prof.avatar}}" height="80px" width="80px" alt="hellatest large avatar">
+                        </div>
+                        <div class="col-md-6">
+                            <h4>{{ user_prof.user.username }}</h4>
+                            <p class="text-muted"><small>{{ user_prof.user.username }}  是第{{user_prof.user.id}}位会员，加入于{{user_prof.user.date_joined| date:'Y年m月d日'}}</small></p>
+                            <p>签名：{{user_prof.signature}}</p>
+                            <p>简介：{{user_prof.user_intro}}</p>
+                        </div>
+                        <div class="col-md-4">
+						{% if user.is_authenticated %}
+							{% ifnotequal user.username user_prof.user.username %}
+						  <button class="btn btn-default" data-toggle="modal" data-target="#message">私信</button>
+						 {% if isFollowed %}
+						 <a href="{% url "follow_del" user_prof.user.id %}" class="btn btn-warning" data-method="post" rel="nofollow">取消关注</a>
+						 {% else %}
+						<a href="{% url "follow_add" user_prof.user.id %}" class="btn btn-info" data-method="post" rel="nofollow">关注</a>
+						 {% endif %}
+							{% endifnotequal %}
+						{% endif %}
+                        </div>
+                        <div class="col-md-12">
+                            <p></p>
+                        </div>
+                    </div>
+                </div><!-- /.info -->
+                <div class="panel panel-default">
+                    <div class="panel-heading">
+                        <h3 class="panel-title"><small>{{ user_prof.user.username }} 最近创建的主题</small></h3>
+                    </div>
+                    <div class="panel-body">
+                        <ul class="media-list">
+						{% for bbs in user_prof.bbs_set.all %}
+                            <li class="media topic-list">
+                                <div class="pull-right">
+                                    <span class="badge badge-info">{{bbs.comments_set.all.count}}</span>
+                                </div>
+                                <div class="media-body">
+                                    <h4 class="media-heading topic-list-heading"><a href="{% url "bbs_detail" bbs.id %}">{{bbs.bbs_title}}</a></h4>
+                                    <p class="small text-muted">
+                                        <span><a href="{% url "category" bbs.bbs_category.id %}">{{bbs.bbs_category}}</a></span>&nbsp;•&nbsp;
+                                        <span>{{bbs.created_at|naturaltime}}</span>&nbsp;•&nbsp;
+                                    </p>
+                                </div>
+                            </li>
+						{% endfor %}
+                        </ul>
+                        <ul class="pagination"></ul>
+                    </div>
+                </div><!-- /.topics -->
+                <div class="panel panel-default">
+                    <div class="panel-heading">
+                        <h3 class="panel-title"><small>{{ user_prof.user.username }} 最近回复了</small></h3>
+                    </div>
+                    <div class="panel-body">
+                        <ul class="media-list">
+						{% for cmt in user.bbs_user.comments_set.all reversed %}
+						 <li class="media reply-list">
+                                <div class="media-body reply_content">
+                                    <h4 class="media-heading topic-list-heading"><small>回复了 
+									<a href="#" title="Tenzing">{{cmt.bbs_id.bbs_author}}</a> 创建的主题 </small>
+									<a href="{% url "bbs_detail" cmt.bbs_id.id %}">{{cmt.bbs_id.bbs_title}}</a></h4>
+                                    <blockquote>
+                                         {{cmt.cmt_content}}                        
+										<small>7 天前</small>
+                                    </blockquote>
+                                </div>
+                            </li>
+						{% endfor %}
+							
+                        </ul>
+                        <!--<ul class="pagination"></ul>-->
+                    </div>
+                </div><!-- /.comments -->
+
+				
+
+<!-- 模态框-->
+<div class="modal fade" id="message">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">关闭</span></button>
+        <h4 class="modal-title">发信给</h4>
+      </div>
+      <div class="modal-body">
+	    <form id="send-message" class="form-horizontal" action="{% url "message_send" user_prof.user.id %}" method="post">
+			{% csrf_token %}
+			<div class="form-group">
+				<div class="col-md-2 control-label"><label for="message_receiver" class="required">发给：</label></div>
+				<div class="col-md-8">
+					<input type="text" class="form-control"  value="{{ user_prof.user.username }}" disabled/>
+				</div>
+			</div>
+			<div class="form-group">
+				<div class="col-md-2 control-label"><label>内容</label></div>
+				<div class="col-md-8">
+					<textarea id="content" name="content"  class="form-control" rows="5"></textarea>
+				</div>
+			</div>
+			<div class="form-group">
+				  <div class="col-md-offset-2 col-md-2">
+					<button class="btn btn-primary" type="submit">发送</button>
+				  </div>
+				  <div class="col-md-4">
+						<div id="error" class="red"></div>
+				  </div>
+			</div>
+		</form>
+      </div>
+
+    </div><!-- /.modal-content -->
+  </div><!-- /.modal-dialog -->
+</div><!-- /.modal -->
+
+
+{% endblock content %}

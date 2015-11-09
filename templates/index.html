@@ -1,0 +1,52 @@
+{% extends 'base.html' %}
+{% load static %}
+{% load humanize %}
+
+{% block content %}
+<link href="{%static "css/style.css"%}" rel="stylesheet">
+
+
+
+<div class="panel">
+
+{% if cur_cate %}
+	<div class="panel-heading">
+		<a href="{% url "home" %}">Home</a> <span class="chevron">&nbsp;›&nbsp;</span> {{cur_cate}} &nbsp;
+		<span class='pull-right'>话题总数<span class='badge badge-info'>&nbsp;{{ bbs_list.count }}&nbsp;</span></span>
+	</div>
+{% endif %}
+
+<div class="panel-body">
+									 
+		<ul class="media-list" id="topic_list">
+
+			{% for bbs in bbs_list %}
+			<li class="media topic-list">
+				<div class="pull-right">
+					<span class="badge badge-info topic-comment"><a href="#">{{ bbs.comments_set.all.count}}</a></span>
+				</div>
+				<a class="media-left" href="#"><img class="img-rounded medium" src="/media/{{bbs.bbs_author.avatar}}" alt="avatar"></a>
+				<div class="media-body">
+					<h2 class="media-heading topic-list-heading"><a href="{% url "bbs_detail" bbs.id %}">{{ bbs.bbs_title }}</a></h2>
+					<p class="text-muted">
+						<span><a href="{% url "category" bbs.bbs_category.id %}">{{bbs.bbs_category}}</a></span>&nbsp;•&nbsp;
+						<span><a href="{% url "user_profile" bbs.bbs_author.user.id %}">{{bbs.bbs_author}}</a></span>&nbsp;•&nbsp;
+						<span>{{bbs.created_at|naturaltime}}</span>&nbsp;•&nbsp;
+
+						<!--<span>最后回复来自 <a href="#"></a></span>-->
+					</p>
+				</div>
+			</li>
+			{% endfor %}
+		</ul>
+
+</div>
+<div class="panel-footer"><a href="{% url "recent" 1 %}" id="getmore" class="startbbs">更多新主题</a></div>
+</div>
+
+<script>
+(function(){
+var close = document.getElementById()
+}
+</script>
+{% endblock content %}

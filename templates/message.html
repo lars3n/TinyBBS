@@ -1,0 +1,38 @@
+{% extends 'base.html' %}
+{% load static %}
+{% load humanize %}
+
+{% block content %}
+<link href="{%static "css/style.css"%}" rel="stylesheet">
+
+
+<div class="panel">
+	<div class="panel-heading">
+		<h4>私信</h4>
+	</div>
+	<div class="panel-body">
+		<ul class="media-list">
+		{% for dialog in dialogList reversed %}
+			<li class="media alert alert-warning">
+				<a class="media-left" href="#">
+					<img src="/media/{{ dialog.msg_from.avatar }}" alt="hellatest2" height="70px" width="70px">
+				</a>
+				<div class="media-body">
+					<h5 class="media-heading"><a href="#">
+					{{dialog.message_set.frist}}
+					{% ifequal dialog.msg_from.user.username user.username %}
+						{{dialog.msg_to}}
+					{% else %}
+						{{dialog.msg_from}}
+					{% endifequal %}
+					</a> {{dialog.created_at|naturaltime}}</h5>
+					<p>{{dialog.msg_content}} <a href="{% url "message_show" dialog.dialog.id %}">查看对话({{dialog.dialog.message_set.all.count}})</a></p>
+				</div>
+			</li>
+		{% endfor %}
+		</ul>
+	</div>
+</div>
+ 
+			
+{% endblock content %}

@@ -1,0 +1,44 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+
+
+<div class="panel panel-default">
+	<div class="panel-heading">
+	<a href="{% url "home" %}">Home</a> <span class="chevron">&nbsp;›&nbsp;</span> 重置密码 &nbsp;
+	</div>
+	<div class="panel-body">
+		{% if success %}
+		<p> 密码已重置，请重新登录 </p>
+		{% else %}
+		<form accept-charset="UTF-8" action="" class="form-horizontal" id="new_user" method="post" novalidate="novalidate">
+		{% csrf_token %}
+			<div class="form-group">
+				<label class="col-md-2 control-label" for="user_nickname">新密码</label>
+				<div class="col-md-6">
+				<input class="form-control" id="id_email" name="password1" size="50" type="password" value=""/>
+				<span class="help-block red">{{form.password1.errors}}</span>
+				</div>
+			</div>
+
+			<div class="form-group">
+				<label class="col-md-2 control-label" for="user_nickname">密码确认</label>
+				<div class="col-md-6">
+				<input class="form-control" id="id_email" name="password2" size="50" type="password" value=""/>
+				<span class="help-block red">{{form.password2.errors}}</span>
+				</div>
+			</div>
+
+			<div class='form-group'>
+				<div class="col-md-offset-2 col-md-9">
+					<button type="submit" name="commit" class="btn btn-primary">提交</button>
+				</div>
+			</div>
+		</form>
+		{% endif %}
+	</div>
+</div>
+
+
+{% endblock content %}

@@ -1,0 +1,69 @@
+{% extends 'base.html' %}
+{% load static %}
+{% load humanize %}
+
+{% block content %}
+<link href="{%static "css/style.css"%}" rel="stylesheet">
+
+<div class="panel">
+	<div class="panel-heading">
+		<h4>与
+					{% ifequal msg1.msg_from.user.username user.username %}
+						{{msg1.msg_to}}
+					{% else %}
+						{{msg1.msg_from}}
+					{% endifequal %}的对话<small class="pull-right"><a href="{% url "message" %}">返回私信列表</a></small></h4>
+	</div>
+	<div class="panel-body">
+		<div class="clearfix">
+		<form id="send-message" action="" method="post" class="reply-message">
+		{% csrf_token %}
+			<div class="form-group">
+				<textarea id="content"  class="form-control" name="content" rows="5" cols="3"></textarea>
+			</div>
+			<div class="form-group">
+				<div class="col-md-2 pull-right">
+				<input type="hidden" id="receiver_uid" name="receiver_uid" value="6049" />
+				<button type="submit" class="btn btn-primary pull-right">发送</button>
+				</div>
+			<div class="col-md-offset-4 col-md-4">
+		<div id="error" class="red"></div>
+			</div>
+			</div>
+		</form>
+		</div>
+		
+		<ul class="media-list">
+		{% for m in msg reversed%}
+
+		{% ifequal m.msg_from.user.username user.username %}
+			<li class="media">
+				<a class="media-left" href="#">
+				  <img src="/media/{{ user.bbs_user.avatar }}" alt="头像" height="70px" width="70px">
+				</a>
+				<div class="media-body alert alert-info">
+				  我:
+				  {{m.msg_content}}				      <p>
+				 {{m.created_at|naturaltime}}</p>
+				</div>
+			  </li>
+			 {% else %}
+			<li class="media">
+			<div class="media-body alert alert-warning">
+			   {{m.msg_from}}:
+			  {{m.msg_content}}						            <p>
+			 {{m.created_at|naturaltime}}</p>
+			 </div>
+			<a class="media-right" href="#">
+			  <img src="/media/{{ m.msg_from.avatar }}" alt="头像" height="70px" width="70px">
+			</a>
+		  </li>	
+		  {% endifequal %}
+		  {% endfor %}
+				</ul>
+
+				   </div>
+</div>
+
+
+{% endblock content %}

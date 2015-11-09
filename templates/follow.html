@@ -1,0 +1,50 @@
+{% extends 'base.html' %}
+{% load static %}
+{% load humanize %}
+
+{% block content %}
+<link href="{%static "css/style.css"%}" rel="stylesheet">
+
+<div class="panel panel-default">
+	<div class="panel-heading">
+		<h3 class="panel-title">我关注的会员</h3>
+	</div>
+	<div class="panel-body">
+		<ul class='user-list clearfix'>
+
+		{% for i in followList %}
+			<li>
+			<a href="{% url "user_profile" i.user.id %}"  title="{{i}}">
+			<img class="img-rounded" alt="xcloud" src="/media/{{i.avatar}}" />
+			</a>
+			</li>
+		{% endfor %}
+		</ul>
+	</div>
+</div>
+<div class="panel panel-default">
+	<div class="panel-heading">
+		<h3 class="panel-title">关注会员的话题</h3>
+	</div>
+	<div class="panel-body">
+		<ul class="media-list">
+		{% for bbs in followBbsList %}
+			<li class="media">
+				<a class="media-left" href="{% url "user_profile" bbs.bbs_author.user.id %}">
+				<img class="img-rounded" src="/media/{{bbs.bbs_author.avatar}}" alt="{{bbs.bbs_author}}" height="70px" width="70px"></a>
+				<div class="media-body">
+					<h4 class="media-heading"><a href="{% url "bbs_detail" bbs.id %}">{{bbs.bbs_title}}</a></h4>
+					<p class="text-muted">
+						<span><a href="{% url "category" bbs.bbs_category.id %}">{{bbs.bbs_category}}</a></span>&nbsp;•&nbsp;
+						<span><a href="{% url "user_profile" bbs.bbs_author.user.id %}">{{bbs.bbs_author}}</a></span>&nbsp;•&nbsp;
+						<span>{{bbs.created_at|naturaltime}}</span>&nbsp;•&nbsp;
+					</p>
+				</div>
+			</li>
+		{% endfor %}
+		</ul>
+	</div>
+</div>
+
+
+{% endblock content %}
