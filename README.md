@@ -32,4 +32,18 @@ a tiny BBS(forum) based on Django
 ##感悟
 * 最难的地方在于数据库的表结构设计
 
+##运行情况截图：
+![](img/bbs1.jpg)
+
+![](img/bbs2.jpg)
+
+![](img/bbs3.jpg)
+
+![](img/bbs4.jpg)
+
+![](img/bbs5.jpg)
+
+![](img/bbs6.jpg)
+
+
 **此应用暂未完善，仅供参考**
